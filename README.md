@@ -1,5 +1,8 @@
 # Decentraland Cpp Scene
 This scene is a proof of WASM modules.
 
+## Install
+To install dependencies run `npm run all-install`.
+
 ## Testing
-- `npm install`
+- Just run `npm start`
