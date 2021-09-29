@@ -47,3 +47,4 @@ compile:
 	cd cmake-build && make
 	mkdir -p build && cp cmake-build/decentraland-wasm-example-cpp build/game.wasm
 	cp build/game.wasm standalone/game.wasm
+	cp build/game.wasm ../bin/game.wasm

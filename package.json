@@ -14,5 +14,8 @@
   },
   "devDependencies": {
     "decentraland-ecs": "latest"
+  },
+  "dependencies": {
+    "@dcl/kernel": "https://sdk-team-cdn.decentraland.org/@dcl/kernel/branch/experimental/wasm-loader/dcl-kernel-1.0.0-1278829901.commit-b475a92.tgz"
   }
 }

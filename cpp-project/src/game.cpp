@@ -15,11 +15,14 @@
 // IO Stuffs
 int instance_init_flag = 0;
 int renderer_fd = -1;
+int debugger_input_fd = -1;
+int debugger_output_fd = -1;
 std::map<std::string, int *> file_descriptors;
 
 std::unique_ptr<Scene> scene;
+extern int quickjs_test(std::string address = "", int fdDebuggerInput = 0, int fdDebuggerOutput = 0);
 
-void init()
+void scene_init()
 {
   // SCENE
   scene = std::make_unique<Scene>();
@@ -31,6 +34,8 @@ void init()
 
   // init file_descriptor
   file_descriptors["RENDERER"] = &renderer_fd;
+  file_descriptors["DEBUG_IN"] = &debugger_input_fd;
+  file_descriptors["DEBUG_OUT"] = &debugger_output_fd;
   renderer_fd = -1;
 }
 
@@ -53,52 +58,59 @@ std::vector<std::string> split_string(std::string s, std::string delimiter)
 
 void processStdIn()
 {
-  std::string input;
-  char buf[64];
+  std::vector<std::string> commands;
+  std::string parse_input;
+  char buf[128];
 
-  int ret = read(0, buf, 16);
-  printf("read %d bytes\n", ret);
-
-  while (ret > 0)
+  do
   {
-    for (int i = 0; i < ret; i++)
-    {
-      input += buf[i];
-    }
-    ret = read(0, buf, 64);
-    printf("read %d bytes\n", ret);
-  }
-
-  printf("processing input '%s' \n", input.c_str());
-
-  if (!input.empty())
-  {
-    std::size_t first_space = input.find_first_of(" ");
-    if (first_space == std::string::npos)
-    {
-      return;
-    }
-
-    std::string command = input.substr(0, first_space);
-    std::string raw_params = input.substr(first_space + 1, input.length() - first_space);
-    std::vector<std::string> params = split_string(raw_params, " ");
-
-    printf("processing command '%s' with %d params - rawparams '%s' \n",
-           command.c_str(), static_cast<int>(params.size()), raw_params.c_str());
-
-    if (command == "set_fd" && params.size() == 2)
-    {
-      std::string fd_name = params[0];
-      int value = atoi(params[1].c_str());
-
-      if (file_descriptors.find(fd_name) != file_descriptors.end())
-      {
-        *(file_descriptors[fd_name]) = value;
-        printf("setting a fileDescriptor '%s' to %d OK\n", fd_name.c_str(), value);
+    char c;
+    int ret = read(0, &c, 1);
+    if (ret == 1) {
+      if (c == 0 || c == '\n'){
+        commands.push_back(parse_input);
+        parse_input = "";
+      }else{
+        parse_input += c;
       }
-      else
+    }else{
+      commands.push_back(parse_input);
+      break;
+    }
+  } while (1);
+
+  for (const std::string& input: commands){
+    if (!input.empty())
+    {
+      printf("processing input '%s' \n", input.c_str());
+
+      std::size_t first_space = input.find_first_of(" ");
+      if (first_space == std::string::npos)
       {
-        printf("setting a fileDescriptor '%s' to %d failed: not exists\n", fd_name.c_str(), value);
+        return;
+      }
+
+      std::string command = input.substr(0, first_space);
+      std::string raw_params = input.substr(first_space + 1, input.length() - first_space);
+      std::vector<std::string> params = split_string(raw_params, " ");
+
+      printf("processing command '%s' with %d params - rawparams '%s' \n",
+            command.c_str(), static_cast<int>(params.size()), raw_params.c_str());
+
+      if (command == "set_fd" && params.size() == 2)
+      {
+        std::string fd_name = params[0];
+        int value = atoi(params[1].c_str());
+
+        if (file_descriptors.find(fd_name) != file_descriptors.end())
+        {
+          *(file_descriptors[fd_name]) = value;
+          printf("setting a fileDescriptor '%s' to %d OK\n", fd_name.c_str(), value);
+        }
+        else
+        {
+          printf("setting a fileDescriptor '%s' to %d failed: not exists\n", fd_name.c_str(), value);
+        }
       }
     }
   }
@@ -109,8 +121,12 @@ int _update(float dt)
   if (instance_init_flag == 0)
   {
     instance_init_flag = 1;
-    init();
+    scene_init();
   }
+
+  // debugger_input_fd => 
+
+  quickjs_test("0.0.0.0:7666", debugger_output_fd, debugger_input_fd);
 
   processStdIn();
   // printf("update(%f)\n", dt);

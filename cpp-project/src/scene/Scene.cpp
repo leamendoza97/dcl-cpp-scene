@@ -126,7 +126,7 @@ void Scene::update(float dt)
     auto view = registry->view<TransformComponent>();
     for (auto [entity, pos] : view.each())
     {
-        pos.position.x = 8.0f + cos(static_cast<double>(counter));
+       // pos.position.x = 12.0f + cos(static_cast<double>(counter));
         pos.position.z = 8.0f + sin(static_cast<double>(counter));
     }
 }

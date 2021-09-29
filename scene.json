@@ -1,6 +1,6 @@
 {
   "display": {
-    "title": "DCL Scene",
+    "title": "Cpp WASM Scene",
     "description": "My new Decentraland project",
     "navmapThumbnail": "images/scene-thumbnail.png",
     "favicon": "favicon_asset"
@@ -12,12 +12,12 @@
   "owner": "",
   "scene": {
     "parcels": [
-      "0,0"
+      "79,157"
     ],
-    "base": "0,0"
+    "base": "79,157"
   },
   "requiredPermissions": [],
-  "main": "bin/game.wasm",
+  "main": "bin/game.js",
   "tags": [],
   "spawnPoints": [
     {
