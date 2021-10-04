@@ -31,8 +31,7 @@ project(decentraland-cpp-runtime CXX)
 
 add_executable(decentraland-wasm-example-cpp 
     src/game.cpp
-    src/quickjs_example.cpp
-    src/scene/Scene.cpp
+    src/FDSocket.cpp
 )
 
 include_directories(src/3rdparty/entt/includes)

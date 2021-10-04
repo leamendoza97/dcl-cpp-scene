@@ -17,7 +17,7 @@
     "base": "79,157"
   },
   "requiredPermissions": [],
-  "main": "bin/game.js",
+  "main": "bin/game.wasm",
   "tags": [],
   "spawnPoints": [
     {
